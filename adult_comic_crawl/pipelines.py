@@ -44,9 +44,9 @@ class AdultComicCrawlPipeline:
     def process_item(self, item, spider):
         try:
             img = item['comic_cover']
-            print(222222)
+
             print(img)
-            print(222222)
+
             # img = base64.b64encode(img.read())
             # data = Comic_Data_18(
             #                     comic_cover = img
@@ -71,14 +71,13 @@ class ImgDownloadPipeline(ImagesPipeline):
     #     self.Session = sessionmaker(bind=engine)
 
     def get_media_requests(self, item, info):
-        print(1111111)
         yield Request(item['comic_cover'])
 
     def item_completed(self, results, item, info):
-        print(results)
         image_paths = [x['path'] for ok, x in results if ok]
         
         if not image_paths:
             raise DropItem("Item contains no images")
         item['comic_cover'] = image_paths
         return item
+        # return '%s.jpg' % request.meta['image_name']

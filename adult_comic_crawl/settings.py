@@ -30,7 +30,8 @@ log_file_path = "logs/comic_{}_{}_{}.log".format(today.year, today.month, today.
 LOG_FILE = log_file_path
 LOG_LEVEL = 'ERROR'
 
-
+# FILES_URLS_FIELD = 'instead_of_image_urls_field_name'
+# FILES_RESULT_FIELD = 'instead_of_images_field_name'
 IMAGES_STORE = 'images'
 IMAGES_URLS_FIELD = 'comic_cover'
 

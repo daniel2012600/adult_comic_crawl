@@ -12,14 +12,15 @@
 import hashlib
 import json
 import re
-comic_id = 14617
-cover_list = ["https://cdn-msp.18comic.vip/media/albums/blank.jpg","https://cdn-msp.18comic.vip/media/albums/256394_3x4.jpg?v=1655698199"]
-for i in cover_list:
-    if re.match('.*/blank.jpg',i):
-        print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
-    else:
-        print(i)
-
+# comic_id = 14617
+# cover_list = ["https://cdn-msp.18comic.vip/media/albums/blank.jpg","https://cdn-msp.18comic.vip/media/albums/256394_3x4.jpg?v=1655698199"]
+# for i in cover_list:
+#     if re.match('.*/blank.jpg',i):
+#         print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
+#     else:
+#         print(i)
+a = ['full/67966a51a50cb69e48d18a241e9e045aa2ba0590.jpg']
+print(a[0].split('/')[1] )
 
     # print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
 
