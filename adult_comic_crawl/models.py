@@ -7,7 +7,7 @@ import datetime
 import adult_comic_crawl.settings as settings
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, JSON
+from sqlalchemy import create_engine, Column, Integer, String, LargeBinary
 #from coolscrapy.settings import DATABASE
 #
 def db_connect():
@@ -34,6 +34,6 @@ class Comic_Data_18(Base): #这个参数父类名
     __tablename__='18comic_data' #存储岗位基本信息的数据表
     __table_args__ = {'mysql_charset': "utf8"}
     id=Column(Integer,primary_key=True)
-    comic_title=Column(String(50))
-    comic_author=Column(String(50))
-    comic_cover=Column(String(200))
+    # comic_title=Column(String(50))
+    # comic_author=Column(String(50))
+    comic_cover=Column(LargeBinary)

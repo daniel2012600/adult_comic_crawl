@@ -4,7 +4,7 @@ from ..items import AdultComicCrawlItem
 import hashlib
 import json
 from PIL import Image
-
+import re
 class A18comicSpider(scrapy.Spider):
     name = '18comic'
     allowed_domains = ['18comic.org']
@@ -13,29 +13,36 @@ class A18comicSpider(scrapy.Spider):
     start_urls = ["https://18comic.org/albums/hanman?o=mv"]
     def parse(self, response):
         # 第一層 熱門漫畫頁，獲取(作品名稱、作者、作品封面到第一張table)，擷取作品連結，做另一個def去解析
-
+        self.logger.info(response.url)
         for i,j in  enumerate(response.xpath("//div[@class='thumb-overlay-albums']/a/@href")):
-            comic_link = "https://18comic.org" + response.xpath("//div[@class='thumb-overlay-albums']/a/@href")[i].extract() #作品連結
+            comic_link = response.xpath("//div[@class='thumb-overlay-albums']/a/@href")[i].extract() #作品連結
             comic_id = comic_link.split('/')[2] #作品ID
             # mac 擷取到的封面 https://cdn-msp.18comic.vip/media/albums/blank.jpg  需要找其他方式（拼接或找其他element) 
-            # (WIN) "https://cdn-msp.18comic.vip/media/albums/256394_3x4.jpg?v=1655698199"
-            win_comic_cover = response.xpath("//div[@class='thumb-overlay-albums']/a/img/@src")[i].extract() #封面 (WIN可直接獲取)
+            # "https://cdn-msp.18comic.vip/media/albums/256394_3x4.jpg?v=1655698199"
+            raw_comic_cover = response.xpath("//div[@class='thumb-overlay-albums']/a/img/@src")[i].extract() #封面 (WIN可直接獲取)
             # {comic_id}_3x4.jpg?_v={self.time_trans(self.time_params)}
-            comic_cover = f"{win_comic_cover.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v={self.time_trans(self.time_params)}"  #封面 mac
+            if re.match('.*/blank.jpg',raw_comic_cover):
+                comic_cover = f"{raw_comic_cover.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v={self.time_trans(self.time_params)}"  #封面 mac
+            else:
+                comic_cover = raw_comic_cover
+
             comic_title = response.xpath("//span[@class='video-title title-truncate m-t-5']/text()")[i].extract() #作品名稱
             comic_author = response.xpath(f"(//div[@class='p-b-15 p-l-5 p-r-5']/div[contains(.,'作者')])[{i+1}]/a/text()").extract() #作者
             m = hashlib.md5()
             m.update(comic_title.encode("utf-8"))
             uuid_id = m.hexdigest()
-            # self.items['comic_cover'] = comic_cover
-            yield scrapy.Request(comic_cover, callback = self.get_image, dont_filter=True)
             # self.items['comic_title'] = uuid_id
             # self.items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
-            # yield self.items
+            self.items['comic_cover'] = comic_cover
+            yield self.items
+            # yield scrapy.Request(comic_cover, callback = self.get_photo, dont_filter=True)
         # 第二層 某本漫畫頁 獲取( 章節數ID(有幾話)
+            comic_url = "https://18comic.org" + comic_link
             # yield scrapy.Request(comic_link, callback = self.get_chapter_url, dont_filter=True)
 
-
+    # def get_photo(self, response):
+    #     self.items['comic_cover'] = response
+    #     yield self.items
 
     # def get_chapter_url(self, response):
     #     chapter_list = response.xpath("(//div[@class='episode'])[3]/ul/a/@href").extract()

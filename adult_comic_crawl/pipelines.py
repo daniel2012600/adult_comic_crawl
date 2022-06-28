@@ -9,6 +9,11 @@ from itemadapter import ItemAdapter
 from adult_comic_crawl.models import db_connect, create_news_table, Comic_Data_18
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
+import base64
+import logging
+from scrapy.pipelines.images import ImagesPipeline
+from scrapy.exceptions import DropItem
+from scrapy import Request
 
 @contextmanager
 def session_scope(Session):
@@ -37,12 +42,43 @@ class AdultComicCrawlPipeline:
         pass
 
     def process_item(self, item, spider):
-        data = Comic_Data_18(comic_title = item['comic_title'],
-                                comic_author = item['comic_author'],
-                                comic_cover = item['comic_cover']
-        )
-        with session_scope(self.Session) as session:
-            session.add(data)
-
+        try:
+            img = item['comic_cover']
+            print(222222)
+            print(img)
+            print(222222)
+            # img = base64.b64encode(img.read())
+            # data = Comic_Data_18(
+            #                     comic_cover = img
+            # )
+            # with session_scope(self.Session) as session:
+            #     session.add(data)
+                
+        except Exception as error:
+            self.connect.rollback()  #發生錯誤，則退回上一次資料庫狀態
+            logging.error(error)
+            
     def close_spider(self, spider):
         pass
+
+
+
+class ImgDownloadPipeline(ImagesPipeline):
+    # """保存文章到数据库"""
+    # def __init__(self):
+    #     engine = db_connect()
+    #     create_news_table(engine)
+    #     self.Session = sessionmaker(bind=engine)
+
+    def get_media_requests(self, item, info):
+        print(1111111)
+        yield Request(item['comic_cover'])
+
+    def item_completed(self, results, item, info):
+        print(results)
+        image_paths = [x['path'] for ok, x in results if ok]
+        
+        if not image_paths:
+            raise DropItem("Item contains no images")
+        item['comic_cover'] = image_paths
+        return item

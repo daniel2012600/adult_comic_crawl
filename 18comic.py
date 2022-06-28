@@ -11,18 +11,29 @@
 # import pymysql
 import hashlib
 import json
+import re
+comic_id = 14617
+cover_list = ["https://cdn-msp.18comic.vip/media/albums/blank.jpg","https://cdn-msp.18comic.vip/media/albums/256394_3x4.jpg?v=1655698199"]
+for i in cover_list:
+    if re.match('.*/blank.jpg',i):
+        print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
+    else:
+        print(i)
 
-a = "H的玩具~追求刺激的愛~ / 玩具大師 [Doya/zeplin]エッチなオモチャ〜刺激的な愛を求めて〜 [禁漫天堂]"
-b = ['夏黑', '醃蘿蔔']
-# x = json.dumps(b,ensure_ascii=False)
-p = []
-w = {}
-for i,j in enumerate(b):
-    w[f'author{i+1}'] = j
 
-x = json.dumps(w,ensure_ascii=False)
+    # print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
 
-print(x)
+# a = "H的玩具~追求刺激的愛~ / 玩具大師 [Doya/zeplin]エッチなオモチャ〜刺激的な愛を求めて〜 [禁漫天堂]"
+# b = ['夏黑', '醃蘿蔔']
+# # x = json.dumps(b,ensure_ascii=False)
+# p = []
+# w = {}
+# for i,j in enumerate(b):
+#     w[f'author{i+1}'] = j
+
+# x = json.dumps(w,ensure_ascii=False)
+
+# print(x)
 
 # # 轉換日期格式至UNIX
 # def time_trans(qurey_date):
