@@ -19,8 +19,21 @@ import re
 #         print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
 #     else:
 #         print(i)
-a = ['full/67966a51a50cb69e48d18a241e9e045aa2ba0590.jpg']
-print(a[0].split('/')[1] )
+# a = ['full/67966a51a50cb69e48d18a241e9e045aa2ba0590.jpg']
+# print(a[0].split('/')[1] )
+# class A:
+#      def add(self, x):
+#          y = x+1
+#          print(y)
+# class B(A):
+#     def add(self, x):
+#         super(B, self).add(x)
+# b = B()
+# b.add(2)  # 3
+path = "https://cdn-msp.18comic.vip/media/albums/85250_3x4.jpg?_v=1656502977"
+x = re.split('albums/', path)
+print(x[1].split('?_')[0])
+
 
     # print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
 

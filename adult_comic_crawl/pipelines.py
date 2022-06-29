@@ -14,7 +14,10 @@ import logging
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 from scrapy import Request
-
+from . import settings
+import os
+import re
+from adult_comic_crawl.items import AdultComicCrawlItem
 @contextmanager
 def session_scope(Session):
     """Provide a transactional scope around a series of operations."""
@@ -65,19 +68,15 @@ class AdultComicCrawlPipeline:
 
 class ImgDownloadPipeline(ImagesPipeline):
     # """保存文章到数据库"""
-    # def __init__(self):
-    #     engine = db_connect()
-    #     create_news_table(engine)
-    #     self.Session = sessionmaker(bind=engine)
-
+    
     def get_media_requests(self, item, info):
-        yield Request(item['comic_cover'])
+        yield Request(item['image_urls'])
 
-    def item_completed(self, results, item, info):
-        image_paths = [x['path'] for ok, x in results if ok]
-        
-        if not image_paths:
-            raise DropItem("Item contains no images")
-        item['comic_cover'] = image_paths
-        return item
-        # return '%s.jpg' % request.meta['image_name']
+    def file_path(self, request, response=None, info=None):
+        print("##############")
+        image_id  = re.split('albums/', request.url)
+        image_id = image_id[1].split('?_')[0]
+        path = "covers/%s" % image_id
+        print(path)
+        # return path
+

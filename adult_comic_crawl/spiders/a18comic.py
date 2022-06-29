@@ -31,14 +31,15 @@ class A18comicSpider(scrapy.Spider):
             m = hashlib.md5()
             m.update(comic_title.encode("utf-8"))
             uuid_id = m.hexdigest()
-            # self.items['comic_title'] = uuid_id
+            self.items['comic_title'] = uuid_id
             # self.items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
-            self.items['comic_cover'] = comic_cover
-            yield self.items
+            self.items['image_urls'] = comic_cover
             # yield scrapy.Request(comic_cover, callback = self.get_photo, dont_filter=True)
+            yield self.items
         # 第二層 某本漫畫頁 獲取( 章節數ID(有幾話)
             comic_url = "https://18comic.org" + comic_link
             # yield scrapy.Request(comic_link, callback = self.get_chapter_url, dont_filter=True)
+
 
     # def get_photo(self, response):
     #     self.items['comic_cover'] = response
