@@ -38,20 +38,19 @@ class A18comicSpider(scrapy.Spider):
             yield self.items
         # 第二層 某本漫畫頁 獲取( 章節數ID(有幾話)
             comic_url = "https://18comic.org" + comic_link
-            # yield scrapy.Request(comic_link, callback = self.get_chapter_url, dont_filter=True)
+            yield scrapy.Request(comic_url, callback = self.get_chapter_url, dont_filter=True)
 
 
-    # def get_photo(self, response):
-    #     self.items['comic_cover'] = response
-    #     yield self.items
-
-    # def get_chapter_url(self, response):
-    #     chapter_list = response.xpath("(//div[@class='episode'])[3]/ul/a/@href").extract()
-    #     for i in chapter_list:
-    #         chapter_url =  "https://18comic.org" + i
-    #         print("##########################")
-    #         print(chapter_url)
-    #         yield scrapy.Request(chapter_url, callback = self.get_chapter_url, dont_filter=True)
+    def get_chapter_url(self, response):
+        print("##########################")
+        # (//div[@class='col-lg-7']/div)[3]/div/ul/a/@href
+        chapter_list = response.xpath("(//div[@class='col-lg-7']/div)[3]/div/ul/a/@href").extract()
+        for i in range(20):
+            chapter_url =  "https://18comic.org" + chapter_list[i]
+            print("##########################")
+            print(chapter_url)
+            print("##########################")
+        #     yield scrapy.Request(chapter_url, callback = self.get_chapter_url, dont_filter=True)
 
 
     # def get_content(self, response):
