@@ -34,65 +34,46 @@ class A18comicSpider(scrapy.Spider):
             self.items['comic_title'] = uuid_id
             # self.items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
             self.items['image_urls'] = comic_cover
-            # yield scrapy.Request(comic_cover, callback = self.get_photo, dont_filter=True)
+            
             yield self.items
         # 第二層 某本漫畫頁 獲取( 章節數ID(有幾話)
             comic_url = "https://18comic.org" + comic_link
-            yield scrapy.Request(comic_url, callback = self.get_chapter_url, dont_filter=True)
+            
+            yield scrapy.Request(comic_url, callback = self.get_chapter_url, dont_filter=True, meta = self.items)
 
 
     def get_chapter_url(self, response):
-        print("##########################")
+        
         # (//div[@class='col-lg-7']/div)[3]/div/ul/a/@href
+        # title = response.xpath("//div[@class='panel-heading']/div/h1/text()").extract()
         chapter_list = response.xpath("(//div[@class='col-lg-7']/div)[3]/div/ul/a/@href").extract()
-        for i in range(20):
+
+        # if len(chapter_list) == 0  點擊開始閱讀 直接獲取內容
+        
+        # for i,j in enumerate(chapter_list):
+        #     print(i+1,j)
+        # 獲取章節網址、ＩＤ
+        for i in range(3):
             chapter_url =  "https://18comic.org" + chapter_list[i]
-            print("##########################")
-            print(chapter_url)
-            print("##########################")
-        #     yield scrapy.Request(chapter_url, callback = self.get_chapter_url, dont_filter=True)
+            response.meta['chapter_id']  = i + 1
 
 
-    # def get_content(self, response):
-    #     photo_id = response.xpath("//div[@class='center scramble-page']/@id")
-    #     # https://cdn-msp.18comic.org/media/photos/180459/00001.jpg?v=1655736355
-    #     # 拼接圖片網址
-    #     for i in photo_id:
-    #         jpg_url = f"https://cdn-msp.18comic.org/media/photos/{comic_id}/{i}?={time_trans(time_params)}"
-    #         jpg = requests.get(jpg_url, headers = public_headers )
+            yield scrapy.Request(chapter_url, callback = self.get_content, dont_filter=True, meta = response.meta )
 
-        # for i,j in enumerate(comic_author):
-        #     print(i,j)
-        # print("##########################")
 
-        # comic_url = "https://18comic.org" +  comic_link
-        # comic_res = requests.get(comic_url, headers = public_headers ).text
-        # comic_res_parse = etree.HTML(comic_res)
-        # title = comic_res_parse.xpath("(//div[@class='panel-heading'])[2]/text()").get()
+    def get_content(self, response):
+        # uuid(title)、chapter_id 章節數、page_id 獲取頁數  ．．．meta?
+        photo_id = response.xpath("//div[@class='center scramble-page']/@id").extract()
+        print('*******')
+        print(response.meta)
         
-        # print(title)
-        
-
-        # title = response.xpath("(//div[@class='panel-heading'])[2]/text()")
-        # # 章節（第...話)
-        # chapter_url =  "https://18comic.org" + response.xpath("(//div[@class='episode'])[3]/ul/a/@href").extract()
-        
-        # print(title)
-        # print(chapter_url)
-        
-
-        # chapter_res = requests.get(chapter_url, headers = public_headers ).text
-        # chapter_res_parse = etree.HTML(chapter_res)
-        # photo_id = chapter_res_parse.xpath("//div[@class='center scramble-page']/@id")
-        # # https://cdn-msp.18comic.org/media/photos/180459/00001.jpg?v=1655736355
-        # # 拼接圖片網址
+        # https://cdn-msp.18comic.org/media/photos/180459/00001.jpg?v=1655736355
+        # 拼接圖片網址
         # for i in photo_id:
         #     jpg_url = f"https://cdn-msp.18comic.org/media/photos/{comic_id}/{i}?={time_trans(time_params)}"
-        #     jpg = requests.get(jpg_url, headers = public_headers )
+        #     print(jpg_url)
+            
 
-
-        # with open("jpg_folder/" + i , "wb") as file:  # 開啟資料夾及命名圖片檔
-        #     file.write(jpg.content)  # 寫入圖片的二進位碼
 
 # 第一層 熱門漫畫頁  獲取(作品名稱、作者、作品圖片)
 

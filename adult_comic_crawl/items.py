@@ -16,6 +16,7 @@ class AdultComicCrawlItem(scrapy.Item):
     comic_title = scrapy.Field()
     comic_author = scrapy.Field()
     comic_cover = scrapy.Field()
+    chapter_id = scrapy.Field()
 
 
 
