@@ -202,3 +202,4 @@ cython_debug/
 18comic.py
 proxy.json
 /images
+listofproxies.txt

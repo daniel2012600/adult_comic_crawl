@@ -12,12 +12,17 @@ class AdultComicCrawlItem(scrapy.Item):
     # 分類的標題
     category=scrapy.Field()
     # 存放圖片地址
-    image_urls=scrapy.Field()
+    comic_cover_urls = scrapy.Field()
     comic_title = scrapy.Field()
     comic_author = scrapy.Field()
     comic_cover = scrapy.Field()
     chapter_id = scrapy.Field()
-
-
-
+    comic_id = scrapy.Field()
+    chapter_id = scrapy.Field()
+    jpg_url = scrapy.Field()
     pass
+
+class ComicContetITem(scrapy.Item):
+    comic_title = scrapy.Field()
+    chapter_id = scrapy.Field()
+    jpg_url = scrapy.Field()

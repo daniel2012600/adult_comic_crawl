@@ -17,7 +17,7 @@ from scrapy import Request
 from . import settings
 import os
 import re
-from adult_comic_crawl.items import AdultComicCrawlItem
+from adult_comic_crawl.items import AdultComicCrawlItem, ComicContetITem
 
 
 @contextmanager
@@ -38,6 +38,9 @@ class AdultComicCrawlPipeline:
 
     # """保存文章到数据库"""
     # def __init__(self):
+    #     comic_data = AdultComicCrawlItem()
+    #     comic_content = ComicContetITem()
+
     #     engine = db_connect()
     #     create_news_table(engine)
     #     self.Session = sessionmaker(bind=engine)
@@ -48,10 +51,8 @@ class AdultComicCrawlPipeline:
 
     def process_item(self, item, spider):
         try:
-            img = item['image_urls']
-            print('*************')
-            print(img)
-            print('*************')
+            # img = item['image_urls']
+            logging.error(item)
             # 拼接獲取的title及cover加上設定好的圖片儲存位置，上傳至SQL
             # img = base64.b64encode(img.read())
             # data = Comic_Data_18(
@@ -68,7 +69,7 @@ class AdultComicCrawlPipeline:
         pass
 
 
-
+# 同時要處理兩個ITEM
 class ImgDownloadPipeline(ImagesPipeline):
     # """保存文章到数据库"""
     

@@ -19,25 +19,7 @@ import re
 #         print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
 #     else:
 #         print(i)
-# a = ['full/67966a51a50cb69e48d18a241e9e045aa2ba0590.jpg']
-# print(a[0].split('/')[1] )
-# class A:
-#      def add(self, x):
-#          y = x+1
-#          print(y)
-# class B(A):
-#     def add(self, x):
-#         super(B, self).add(x)
-# b = B()
-# b.add(2)  # 3
-path = "https://cdn-msp.18comic.vip/media/albums/85250_3x4.jpg?_v=1656502977"
-x = re.split('albums/', path)
-print(x[1].split('?_')[0])
 
-chapter_list = ['/photo/291396', '/photo/292822', '/photo/293874', '/photo/297097', '/photo/298582', '/photo/299170', '/photo/300011', '/photo/301463', '/photo/303021', '/photo/304464', '/photo/306006', '/photo/308443', '/photo/310021', '/photo/314455', '/photo/315928', '/photo/318149', '/photo/319723', '/photo/321965', '/photo/324046', '/photo/325949', '/photo/330252', '/photo/332046', '/photo/333694', '/photo/335458', '/photo/337194', '/photo/339467', '/photo/341265', '/photo/343519', '/photo/345550', '/photo/346786', '/photo/347940', '/photo/351909', '/photo/351825', '/photo/354391']
-
-for i,j in enumerate(chapter_list):
-    print(i+1,j)
 
     # print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
 
