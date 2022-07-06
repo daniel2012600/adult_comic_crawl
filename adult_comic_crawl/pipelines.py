@@ -6,17 +6,14 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-from adult_comic_crawl.models import db_connect, create_news_table, Comic_Data_18
+from adult_comic_crawl.models import db_connect, create_news_table, Comic_Data_18, Comic_Content_18
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
-import base64
 import logging
 from scrapy.pipelines.images import ImagesPipeline
 from scrapy.exceptions import DropItem
 from scrapy import Request
 from . import settings
-import os
-import re
 from adult_comic_crawl.items import AdultComicCrawlItem, ComicContetITem
 
 
@@ -35,15 +32,12 @@ def session_scope(Session):
         session.close()
 
 class AdultComicCrawlPipeline:
-
     # """保存文章到数据库"""
-    # def __init__(self):
-    #     comic_data = AdultComicCrawlItem()
-    #     comic_content = ComicContetITem()
+    def __init__(self):
 
-    #     engine = db_connect()
-    #     create_news_table(engine)
-    #     self.Session = sessionmaker(bind=engine)
+        engine = db_connect()
+        create_news_table(engine)
+        self.Session = sessionmaker(bind=engine)
 
     def open_spider(self, spider):
         """This method is called when the spider is opened."""
@@ -51,22 +45,30 @@ class AdultComicCrawlPipeline:
 
     def process_item(self, item, spider):
         try:
-            # img = item['image_urls']
-            logging.error(item)
-            # 拼接獲取的title及cover加上設定好的圖片儲存位置，上傳至SQL
-            # img = base64.b64encode(img.read())
-            # data = Comic_Data_18(
-            #                     comic_cover = img
-            # )
-            # with session_scope(self.Session) as session:
-            #     session.add(data)
+            if isinstance(item, AdultComicCrawlItem):
+                data = Comic_Data_18(
+                                comic_title = item['comic_title'],
+                                comic_author = item['comic_author'],
+                                comic_cover = f"{settings.IMAGES_STORE}/covers/{item['category']}/{item['comic_title']}.jpg"
+                )
+                with session_scope(self.Session) as session:
+                    session.add(data)
+                
+            elif isinstance(item, ComicContetITem):
+                data = Comic_Content_18(
+                                comic_title = item['comic_title'],
+                                chapter_id = item['chapter_id'],
+                                jpg_urls = f"{settings.IMAGES_STORE}/contents/{item['category']}/{item['comic_title']}/chapter_{item['chapter_id']}/{item['photo_id']}"
+                )
+                with session_scope(self.Session) as session:
+                    session.add(data)
                 
         except Exception as error:
             self.connect.rollback()  #發生錯誤，則退回上一次資料庫狀態
             logging.error(error)
             
-    def close_spider(self, spider):
-        pass
+    # def close_spider(self, spider):
+    #     pass
 
 
 # 同時要處理兩個ITEM
@@ -74,13 +76,31 @@ class ImgDownloadPipeline(ImagesPipeline):
     # """保存文章到数据库"""
     
     def get_media_requests(self, item, info):
-        yield Request(item['image_urls'], meta={'comic_title': item['comic_title']})
+        
+        try:
+            print('*********')
+            print(item)
+            # if isinstance(item, AdultComicCrawlItem):
+            #     yield Request(item['comic_cover_urls'], meta= meta_item )
+            # elif isinstance(item, ComicContetITem):
+            #     yield Request(item['jpg_urls'], meta= meta_item )
+        except Exception as error:
+            logging.error(error)  
 
     def file_path(self, request, response=None, info=None):
-        image_id  = request.meta['comic_title']
-        path = "covers/cover_%s.jpg " % image_id
-        print('================')
-        print(path)
-        print('================')
-        # return path
+        meta_item  = request.meta.item
+
+        try:
+
+            if 'comic_cover_urls' in meta_item :
+                path = f"covers/{meta_item['category']}/{meta_item['comic_title']}.jpg"
+            elif 'jpg_urls' in meta_item :
+                path = f"contents/{meta_item['category']}/{meta_item['comic_title']}/chapter_{meta_item['chapter_id']}/{meta_item['photo_id']}"
+        
+            return path
+
+        except Exception as error:
+            logging.error(error)
+        
+        
 

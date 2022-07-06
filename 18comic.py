@@ -12,29 +12,13 @@
 import hashlib
 import json
 import re
-# comic_id = 14617
-# cover_list = ["https://cdn-msp.18comic.vip/media/albums/blank.jpg","https://cdn-msp.18comic.vip/media/albums/256394_3x4.jpg?v=1655698199"]
-# for i in cover_list:
-#     if re.match('.*/blank.jpg',i):
-#         print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
-#     else:
-#         print(i)
 
-
-    # print(f"{i.split('blank.jpg')[0]}{comic_id}_3x4.jpg?_v=1655698199")
-
-# a = "H的玩具~追求刺激的愛~ / 玩具大師 [Doya/zeplin]エッチなオモチャ〜刺激的な愛を求めて〜 [禁漫天堂]"
-# b = ['夏黑', '醃蘿蔔']
-# # x = json.dumps(b,ensure_ascii=False)
-# p = []
-# w = {}
-# for i,j in enumerate(b):
-#     w[f'author{i+1}'] = j
-
-# x = json.dumps(w,ensure_ascii=False)
-
-# print(x)
-
+meta = {}
+my_id = "https://18comic.org/albums/hanman?o=mv" 
+a = re.split('[/?]', my_id)[-2]
+print(a)
+# meta['comic_id'] = my_id.split('/')[2]
+# print(meta)
 # # 轉換日期格式至UNIX
 # def time_trans(qurey_date):
 #     struct_time = time.strptime(qurey_date, "%Y-%m-%d %H:%M:%S") # 轉成時間元組
