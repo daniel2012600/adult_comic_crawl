@@ -1,94 +1,13 @@
 # -*- coding: utf-8 -*-
-# import os
-# from unicodedata import name
-# import requests
-# import time # 引入time
-# import requests
-# from lxml import etree
-# import re
-# from fake_useragent import UserAgent
-# from PIL import Image
-# import pymysql
-import hashlib
-import json
-import re
-
-meta = {}
-my_id = "https://18comic.org/albums/hanman?o=mv" 
-a = re.split('[/?]', my_id)[-2]
-print(a)
-# meta['comic_id'] = my_id.split('/')[2]
-# print(meta)
-# # 轉換日期格式至UNIX
-# def time_trans(qurey_date):
-#     struct_time = time.strptime(qurey_date, "%Y-%m-%d %H:%M:%S") # 轉成時間元組
-#     time_stamp = int(time.mktime(struct_time)) # 轉成時間戳
-#     return time_stamp
-
-# time_params = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-# ua = UserAgent()
-# public_headers={
-#    'cookie':'__cfduid=d3af1fe4e02395143768f49120192d89a1612161290; _gid=GA1.2.537470263.1612161292; shunt=1; AVS=pgucjspmo4rgafa4vinl3feug4; ipcountry=TW; ipm5=ad96616d894884f20b4e263448a05911; _ga_YYJWNTTJEN=GS1.1.1612339484.9.1.1612339785.59; _gat_ga0=1; _gat_ga1=1; _ga=GA1.2.2093487367.1612161292; _gat_gtag_UA_99252457_3=1; cover=1; _gali=chk_cover',
-#     'User-Agent':ua.random
-# }
-
-
-# url = "https://18comic.org/albums/hanman?o=mv"
-# res = requests.get(url, headers = public_headers).text
-# res_parse = etree.HTML(res)
-# # 熱門漫畫頁
-
-# # for i in res_parse.xpath("//div[@class='thumb-overlay-albums']/a/@href"):
-# #     print("https://18comic.org" + i)
-# comic_address = res_parse.xpath("//div[@class='thumb-overlay-albums']/a/@href")[0]
-# comic_url = "https://18comic.org" +  comic_address
-# comic_id = comic_address.split('/')[2]
-# comic_res = requests.get(comic_url, headers = public_headers ).text
-# comic_res_parse = etree.HTML(comic_res)
-# title = comic_res_parse.xpath("(//div[@class='panel-heading'])[2]/text()")
-# # 章節（第...話)
-# chapter_url =  "https://18comic.org" + comic_res_parse.xpath("(//div[@class='episode'])[3]/ul/a/@href")[0]
-# chapter_res = requests.get(chapter_url, headers = public_headers ).text
-# chapter_res_parse = etree.HTML(chapter_res)
-# photo_id = chapter_res_parse.xpath("//div[@class='center scramble-page']/@id")
-# # https://cdn-msp.18comic.org/media/photos/180459/00001.jpg?v=1655736355
-# # 拼接圖片網址
-# for i in photo_id:
-#     jpg_url = f"https://cdn-msp.18comic.org/media/photos/{comic_id}/{i}?={time_trans(time_params)}"
-#     jpg = requests.get(jpg_url, headers = public_headers )
-
-
-#     with open("jpg_folder/" + i , "wb") as file:  # 開啟資料夾及命名圖片檔
-#         file.write(jpg.content)  # 寫入圖片的二進位碼
-
-
-
-
-# try:
-#     db = pymysql.connect(
-#         host=MYSQL_HOST,
-#         db=MYSQL_DATABASE,
-#         user=MYSQL_USERNAME,
-#         passwd=MYSQL_PASSWORD,
-#         charset='utf8'
-#     )
-#     cursor = db.cursor()
-#     sql = f'SELECT id FROM new_table ORDER BY id DESC ;'
-    
-#     #執行語法
-#     cursor.execute(sql)
-#     #選取第一筆結果
-#     data = cursor.fetchone()
-#     if data :
-#         data = ''.join(data)
-#         db.close()
-
-# except Exception as error:
-#     print("============")
-#     print("資料庫連線異常")
-#     print(error)
-#     print("============")
+class A:
+     def add(self, x):
+         y = x+1
+         print(y)
+class B(A):
+    def add(self, x):
+        super().add(x)
+b = B()
+b.add(2)  # 3
 
 
 # table

@@ -16,6 +16,35 @@ from scrapy import Request
 from . import settings
 from adult_comic_crawl.items import AdultComicCrawlItem, ComicContetITem
 
+class image_save(ImagesPipeline):
+    # """保存文章到数据库"""
+    
+    def get_media_requests(self, item):
+        
+        try:
+            print('*********')
+            print(item)
+            # if isinstance(item, AdultComicCrawlItem):
+            #     yield Request(item['comic_cover_urls'], meta= meta_item )
+            # elif isinstance(item, ComicContetITem):
+            #     yield Request(item['jpg_urls'], meta= meta_item )
+        except Exception as error:
+            logging.error(error)  
+
+    def file_path(self, request, response=None, info=None):
+        meta_item  = request.meta.item
+
+        try:
+
+            if 'comic_cover_urls' in meta_item :
+                path = f"covers/{meta_item['category']}/{meta_item['comic_title']}.jpg"
+            elif 'jpg_urls' in meta_item :
+                path = f"contents/{meta_item['category']}/{meta_item['comic_title']}/chapter_{meta_item['chapter_id']}/{meta_item['photo_id']}"
+        
+            return path
+
+        except Exception as error:
+            logging.error(error)
 
 @contextmanager
 def session_scope(Session):
@@ -46,6 +75,10 @@ class AdultComicCrawlPipeline:
     def process_item(self, item, spider):
         try:
             if isinstance(item, AdultComicCrawlItem):
+                
+                image_pipline = image_save(store_uri = settings.IMAGES_STORE )
+                image_pipline.get_media_requests(item, info = None)
+
                 data = Comic_Data_18(
                                 comic_title = item['comic_title'],
                                 comic_author = item['comic_author'],
@@ -55,52 +88,20 @@ class AdultComicCrawlPipeline:
                     session.add(data)
                 
             elif isinstance(item, ComicContetITem):
-                data = Comic_Content_18(
-                                comic_title = item['comic_title'],
-                                chapter_id = item['chapter_id'],
-                                jpg_urls = f"{settings.IMAGES_STORE}/contents/{item['category']}/{item['comic_title']}/chapter_{item['chapter_id']}/{item['photo_id']}"
-                )
-                with session_scope(self.Session) as session:
-                    session.add(data)
+                pass
+
+                # data = Comic_Content_18(
+                #                 comic_title = item['comic_title'],
+                #                 chapter_id = item['chapter_id'],
+                #                 jpg_urls = f"{settings.IMAGES_STORE}/contents/{item['category']}/{item['comic_title']}/chapter_{item['chapter_id']}/{item['photo_id']}"
+                # )
+                # with session_scope(self.Session) as session:
+                #     session.add(data)
                 
         except Exception as error:
             self.connect.rollback()  #發生錯誤，則退回上一次資料庫狀態
             logging.error(error)
             
-    # def close_spider(self, spider):
-    #     pass
-
-
-# 同時要處理兩個ITEM
-class ImgDownloadPipeline(ImagesPipeline):
-    # """保存文章到数据库"""
-    
-    def get_media_requests(self, item, info):
-        
-        try:
-            print('*********')
-            print(item)
-            # if isinstance(item, AdultComicCrawlItem):
-            #     yield Request(item['comic_cover_urls'], meta= meta_item )
-            # elif isinstance(item, ComicContetITem):
-            #     yield Request(item['jpg_urls'], meta= meta_item )
-        except Exception as error:
-            logging.error(error)  
-
-    def file_path(self, request, response=None, info=None):
-        meta_item  = request.meta.item
-
-        try:
-
-            if 'comic_cover_urls' in meta_item :
-                path = f"covers/{meta_item['category']}/{meta_item['comic_title']}.jpg"
-            elif 'jpg_urls' in meta_item :
-                path = f"contents/{meta_item['category']}/{meta_item['comic_title']}/chapter_{meta_item['chapter_id']}/{meta_item['photo_id']}"
-        
-            return path
-
-        except Exception as error:
-            logging.error(error)
-        
-        
+    def close_spider(self, spider):
+        pass
 
