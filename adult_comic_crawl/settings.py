@@ -33,7 +33,6 @@ LOG_LEVEL = 'ERROR'
 # FILES_URLS_FIELD = 'instead_of_image_urls_field_name'
 # FILES_RESULT_FIELD = 'instead_of_images_field_name'
 IMAGES_STORE = 'images'
-IMAGES_URLS_FIELD = 'comic_cover'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -92,7 +91,7 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'adult_comic_crawl.pipelines.AdultComicCrawlPipeline': 300,
+    'adult_comic_crawl.pipelines.AdultComicPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

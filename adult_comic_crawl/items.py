@@ -14,7 +14,7 @@ class AdultComicCrawlItem(scrapy.Item):
     comic_title = scrapy.Field()
     comic_author = scrapy.Field()
     comic_cover = scrapy.Field()
-    pass
+    cover_path =  scrapy.Field()
 
 class ComicContetITem(scrapy.Item):
     category = scrapy.Field()
@@ -22,3 +22,4 @@ class ComicContetITem(scrapy.Item):
     chapter_id = scrapy.Field()
     jpg_urls = scrapy.Field()
     photo_id = scrapy.Field()
+    content_path =  scrapy.Field()

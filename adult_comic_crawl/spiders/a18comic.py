@@ -7,7 +7,7 @@ import re
 import requests
 class A18comicSpider(scrapy.Spider):
     name = '18comic'
-    download_timeout = 2
+    # download_timeout = 2
     allowed_domains = ['18comic.org']
     comic_data_items = AdultComicCrawlItem()
     comic_conten_items = ComicContetITem()
