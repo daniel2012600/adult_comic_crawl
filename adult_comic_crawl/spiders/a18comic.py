@@ -7,17 +7,17 @@ import re
 import requests
 class A18comicSpider(scrapy.Spider):
     name = '18comic'
-    # download_timeout = 2
+    download_timeout = 1
     allowed_domains = ['18comic.org']
     comic_data_items = AdultComicCrawlItem()
-    comic_conten_items = ComicContetITem()
+    comic_content_items = ComicContetITem()
     time_params = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     start_urls = ["https://18comic.org/albums/hanman?o=mv"]
-    category = re.split('[/?]', start_urls[0])[-2]
 
     def parse(self, response):
         # 第一層 熱門漫畫頁，獲取(作品名稱、作者、作品封面到第一張table)，擷取作品連結，做另一個def去解析
         for i,j in  enumerate(response.xpath("//div[@class='thumb-overlay-albums']/a/@href")):
+            category = re.split('[/?]', response.url)[-2]
             comic_link = response.xpath("//div[@class='thumb-overlay-albums']/a/@href")[i].extract() #作品連結
             comic_id = comic_link.split('/')[2] #作品ID,漫畫頁跟漫畫內容頁不同！！！
             # mac 擷取到的封面 https://cdn-msp.18comic.vip/media/albums/blank.jpg  需要找其他方式（拼接或找其他element) 
@@ -34,7 +34,7 @@ class A18comicSpider(scrapy.Spider):
             m = hashlib.md5()
             m.update(comic_title.encode("utf-8"))
             uuid_id = m.hexdigest()
-            self.comic_data_items['category'] = self.category
+            self.comic_data_items['category'] = category
             self.comic_data_items['comic_title'] = uuid_id
             self.comic_data_items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
             self.comic_data_items['comic_cover_urls'] = comic_cover_url
@@ -52,10 +52,15 @@ class A18comicSpider(scrapy.Spider):
         # for i,j in enumerate(chapter_list):
         #     print(i+1,j)
 
-        meta = {}
-        for i in range(3):
+        meta = {'category':response.meta['category']}
+        for i in range(2):
             if len(chapter_list) == 0 : 
                 comic_href = response.xpath("((//div[@class='col-lg-7']/div)[2]/a)[1]/@href").extract()
+                self.logging.error('檢查')
+                self.logging.error('==================')
+                self.logging.error(comic_href)
+                self.logging.error(comic_href.split('/'))
+                self.logging.error('==================')
                 meta['comic_id'] = comic_href.split('/')[2]
                 meta['comic_title'] = response.meta['comic_title']
                 chapter_url = "https://18comic.org" + comic_href
@@ -84,12 +89,12 @@ class A18comicSpider(scrapy.Spider):
         # 拼接圖片網址
         for photo_id in photo_id_list:
             jpg_url = f"https://cdn-msp.18comic.org/media/photos/{comic_id}/{photo_id}?={self.time_trans(self.time_params)}"
-            self.comic_conten_items['category'] = self.category
-            self.comic_conten_items['comic_title'] = comic_title
-            self.comic_conten_items['chapter_id'] = response.meta['chapter_id']
-            self.comic_conten_items['jpg_urls'] = jpg_url
-            self.comic_conten_items['photo_id'] = photo_id
-            yield self.comic_conten_items
+            self.comic_content_items['category'] = response.meta['category']
+            self.comic_content_items['comic_title'] = comic_title
+            self.comic_content_items['chapter_id'] = response.meta['chapter_id']
+            self.comic_content_items['jpg_urls'] = jpg_url
+            self.comic_content_items['photo_id'] = photo_id
+            yield self.comic_content_items
 
     # 轉換日期格式至UNIX
     def time_trans(self, qurey_date):
