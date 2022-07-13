@@ -6,7 +6,7 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
-from adult_comic_crawl.models import db_connect, create_news_table, Comic_Data_18, Comic_Content_18
+from adult_comic_crawl.models import db_connect, create_news_table, Comic_Info_18, Comic_Content_18
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 import logging
@@ -35,14 +35,13 @@ class AdultComicPipeline(ImagesPipeline):
     # """保存文章到数据库"""
     
     engine = db_connect()
-    create_news_table(engine)
     Session = sessionmaker(bind=engine)
     def get_media_requests(self, item, info ):
 
         try:
             if isinstance(item, AdultComicCrawlItem):
 
-                data = Comic_Data_18(
+                data = Comic_Info_18(
                                 comic_title = item['comic_title'],
                                 comic_author = item['comic_author'],
                                 comic_cover = f"{settings.IMAGES_STORE}/covers/{item['category']}/{item['comic_title']}.jpg"
@@ -56,11 +55,10 @@ class AdultComicPipeline(ImagesPipeline):
                 data = Comic_Content_18(
                                 comic_title = item['comic_title'],
                                 chapter_id = item['chapter_id'],
-                                jpg_urls = f"{settings.IMAGES_STORE}/contents/{item['category']}/{item['comic_title']}/chapter_{item['chapter_id']}/{item['photo_id']}"
+                                comic_content = f"{settings.IMAGES_STORE}/contents/{item['category']}/{item['comic_title']}/chapter_{item['chapter_id']}/{item['photo_id']}"
                 )
                 with session_scope(self.Session) as session:
                     session.add(data)
-
 
                 yield Request(item['jpg_urls'], meta= item )
         except Exception as error:

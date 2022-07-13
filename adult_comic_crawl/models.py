@@ -30,7 +30,7 @@ def _get_date():
     return datetime.datetime.now()
 Base = declarative_base()
 
-class Comic_Data_18(Base): #这个参数父类名
+class Comic_Info_18(Base): #这个参数父类名
     __tablename__='18comic_data' #存储岗位基本信息的数据表
     __table_args__ = {'mysql_charset': "utf8"}
     id=Column(Integer,primary_key=True)

@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+from adult_comic_crawl.models import db_connect, create_news_table, Comic_Info_18, Comic_Content_18
+from sqlalchemy.orm import sessionmaker
+from contextlib import contextmanager
+import adult_comic_crawl.settings
 import scrapy
 import time
 from ..items import AdultComicCrawlItem, ComicContetITem
@@ -5,6 +11,24 @@ import hashlib
 import json
 import re
 import requests
+
+@contextmanager
+def session_scope(Session):
+    """Provide a transactional scope around a series of operations."""
+    session = Session()
+    session.expire_on_commit = False
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+engine = db_connect()
+create_news_table(engine)
+Session = sessionmaker(bind=engine)
 class A18comicSpider(scrapy.Spider):
     name = '18comic'
     download_timeout = 1
@@ -34,11 +58,17 @@ class A18comicSpider(scrapy.Spider):
             m = hashlib.md5()
             m.update(comic_title.encode("utf-8"))
             uuid_id = m.hexdigest()
-            self.comic_data_items['category'] = category
-            self.comic_data_items['comic_title'] = uuid_id
-            self.comic_data_items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
-            self.comic_data_items['comic_cover_urls'] = comic_cover_url
-            yield self.comic_data_items
+            with session_scope(Session) as session:
+                # 確認資料庫是否有漫畫相關資訊
+                query = session.query(Comic_Info_18).filter(Comic_Info_18.comic_title == uuid_id ).all()
+                if query:
+                    pass
+                else:
+                    self.comic_data_items['category'] = category
+                    self.comic_data_items['comic_title'] = uuid_id
+                    self.comic_data_items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
+                    self.comic_data_items['comic_cover_urls'] = comic_cover_url
+                    yield self.comic_data_items
         # 第二層 某本漫畫頁 獲取( 章節數ID(有幾話)
             comic_url = "https://18comic.org" + comic_link
             
