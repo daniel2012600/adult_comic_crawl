@@ -29,14 +29,13 @@ def query_data(item,args):
             if item == 'Info':
                 query = session.query(Comic_Info_18).filter(Comic_Info_18.comic_title==args).all()
             elif item == 'Content':
-                query = session.query( func.max(Comic_Content_18.chapter_id) ).filter(Comic_Content_18.comic_title==args).group_by(Comic_Content_18.comic_title).one()
-                print(query[0])
+                query = session.query( func.max(Comic_Content_18.chapter_id) ).filter(Comic_Content_18.comic_title==args).group_by(Comic_Content_18.comic_title).one()[0]
 
             return query
     except Exception as error:
         print(error)
 
-query_data('Content','f1ffb6596269b49197178cb779f2c4ef')
+print(query_data('Content','158238cd075721499bf77009788a11c5'))
 
 # table
 # 漫畫資訊： uuid、name、author(非唯一）、publish_date、views

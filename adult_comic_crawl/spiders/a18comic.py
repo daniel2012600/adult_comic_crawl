@@ -58,17 +58,16 @@ class A18comicSpider(scrapy.Spider):
             m = hashlib.md5()
             m.update(comic_title.encode("utf-8"))
             uuid_id = m.hexdigest()
-            with session_scope(Session) as session:
-                # 確認資料庫是否有漫畫相關資訊
-                query = session.query(Comic_Info_18).filter(Comic_Info_18.comic_title == uuid_id ).all()
-                if query:
-                    pass
-                else:
-                    self.comic_data_items['category'] = category
-                    self.comic_data_items['comic_title'] = uuid_id
-                    self.comic_data_items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
-                    self.comic_data_items['comic_cover_urls'] = comic_cover_url
-                    yield self.comic_data_items
+            # 確認資料庫是否有漫畫相關資訊
+            query = self.query_data('Info', uuid_id)
+            if query:
+                pass
+            else:
+                self.comic_data_items['category'] = category
+                self.comic_data_items['comic_title'] = uuid_id
+                self.comic_data_items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
+                self.comic_data_items['comic_cover_urls'] = comic_cover_url
+                yield self.comic_data_items
         # 第二層 某本漫畫頁 獲取( 章節數ID(有幾話)
             comic_url = "https://18comic.org" + comic_link
             
@@ -122,7 +121,7 @@ class A18comicSpider(scrapy.Spider):
             self.comic_content_items['category'] = response.meta['category']
             self.comic_content_items['comic_title'] = comic_title
             self.comic_content_items['chapter_id'] = response.meta['chapter_id']
-            self.comic_content_items['jpg_urls'] = jpg_url
+            self.comic_content_items['comic_content'] = jpg_url
             self.comic_content_items['photo_id'] = photo_id
             yield self.comic_content_items
 
@@ -131,3 +130,15 @@ class A18comicSpider(scrapy.Spider):
         struct_time = time.strptime(qurey_date, "%Y-%m-%d %H:%M:%S") # 轉成時間元組
         time_stamp = int(time.mktime(struct_time)) # 轉成時間戳
         return time_stamp
+
+    def query_data(self, item, title):
+        try:
+            with session_scope(Session) as session:
+                if item == 'Info':
+                    query = session.query(Comic_Info_18).filter(Comic_Info_18.comic_title==title).all()
+                elif item == 'Content':
+                    query = session.query( func.max(Comic_Content_18.chapter_id) ).filter(Comic_Content_18.comic_title==title).group_by(Comic_Content_18.comic_title).one()[0]
+
+                return query
+        except Exception as error:
+            print(error)

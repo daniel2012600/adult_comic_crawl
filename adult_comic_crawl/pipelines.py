@@ -60,7 +60,7 @@ class AdultComicPipeline(ImagesPipeline):
                 with session_scope(self.Session) as session:
                     session.add(data)
 
-                yield Request(item['jpg_urls'], meta= item )
+                yield Request(item['comic_content'], meta= item )
         except Exception as error:
             self.connect.rollback()  #發生錯誤，則退回上一次資料庫狀態
             logging.error(error)  
@@ -71,7 +71,7 @@ class AdultComicPipeline(ImagesPipeline):
 
             if 'comic_cover_urls' in meta_item :
                 path = f"covers/{meta_item['category']}/{meta_item['comic_title']}.jpg"
-            elif 'jpg_urls' in meta_item :
+            elif 'comic_content' in meta_item :
                 path = f"contents/{meta_item['category']}/{meta_item['comic_title']}/chapter_{meta_item['chapter_id']}/{meta_item['photo_id']}"
 
             return path

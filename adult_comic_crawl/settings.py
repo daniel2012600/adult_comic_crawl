@@ -14,10 +14,17 @@ BOT_NAME = 'adult_comic_crawl'
 
 SPIDER_MODULES = ['adult_comic_crawl.spiders']
 NEWSPIDER_MODULE = 'adult_comic_crawl.spiders'
-MYSQL_HOST = os.getenv("MYSQL_HOST")
-MYSQL_USERNAME = os.getenv("MYSQL_USERNAME")
-MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
-MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+if os.getenv("MYSQL_HOST"):
+    MYSQL_HOST = os.getenv("MYSQL_HOST")
+    MYSQL_USERNAME = os.getenv("MYSQL_USERNAME")
+    MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+    MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+
+else:
+    MYSQL_HOST = "localhost"
+    MYSQL_USERNAME = 'root'
+    MYSQL_PASSWORD = 'root'
+    MYSQL_DATABASE = 'comic_db'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'adult_comic_crawl (+http://www.yourdomain.com)'

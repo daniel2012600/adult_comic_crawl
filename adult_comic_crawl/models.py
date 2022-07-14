@@ -44,4 +44,4 @@ class Comic_Content_18(Base): #这个参数父类名
     id=Column(Integer,primary_key=True)
     comic_title=Column(String(50))
     chapter_id=Column(String(50))
-    jpg_urls=Column(String(200))
+    comic_content=Column(String(200))

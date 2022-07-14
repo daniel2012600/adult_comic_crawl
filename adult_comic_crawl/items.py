@@ -20,6 +20,6 @@ class ComicContetITem(scrapy.Item):
     category = scrapy.Field()
     comic_title = scrapy.Field()
     chapter_id = scrapy.Field()
-    jpg_urls = scrapy.Field()
+    comic_content = scrapy.Field()
     photo_id = scrapy.Field()
     content_path =  scrapy.Field()
