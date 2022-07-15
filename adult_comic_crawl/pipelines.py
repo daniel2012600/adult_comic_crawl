@@ -40,7 +40,7 @@ class AdultComicPipeline(ImagesPipeline):
 
         try:
             if isinstance(item, AdultComicCrawlItem):
-
+                yield Request(item['comic_cover_urls'], meta= item )
                 data = Comic_Info_18(
                                 comic_title = item['comic_title'],
                                 comic_author = item['comic_author'],
@@ -49,9 +49,8 @@ class AdultComicPipeline(ImagesPipeline):
                 with session_scope(self.Session) as session:
                     session.add(data)
 
-                yield Request(item['comic_cover_urls'], meta= item )
             elif isinstance(item, ComicContetITem):
- 
+                yield Request(item['comic_content'], meta= item )
                 data = Comic_Content_18(
                                 comic_title = item['comic_title'],
                                 chapter_id = item['chapter_id'],
@@ -59,8 +58,6 @@ class AdultComicPipeline(ImagesPipeline):
                 )
                 with session_scope(self.Session) as session:
                     session.add(data)
-
-                yield Request(item['comic_content'], meta= item )
         except Exception as error:
             self.connect.rollback()  #發生錯誤，則退回上一次資料庫狀態
             logging.error(error)  

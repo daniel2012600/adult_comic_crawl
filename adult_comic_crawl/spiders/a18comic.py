@@ -4,6 +4,8 @@ from adult_comic_crawl.models import db_connect, create_news_table, Comic_Info_1
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 import adult_comic_crawl.settings
+from sqlalchemy.sql import func
+
 import scrapy
 import time
 from ..items import AdultComicCrawlItem, ComicContetITem
@@ -31,7 +33,6 @@ create_news_table(engine)
 Session = sessionmaker(bind=engine)
 class A18comicSpider(scrapy.Spider):
     name = '18comic'
-    download_timeout = 1
     allowed_domains = ['18comic.org']
     comic_data_items = AdultComicCrawlItem()
     comic_content_items = ComicContetITem()
@@ -59,50 +60,49 @@ class A18comicSpider(scrapy.Spider):
             m.update(comic_title.encode("utf-8"))
             uuid_id = m.hexdigest()
             # 確認資料庫是否有漫畫相關資訊
-            query = self.query_data('Info', uuid_id)
-            if query:
-                pass
-            else:
-                self.comic_data_items['category'] = category
-                self.comic_data_items['comic_title'] = uuid_id
-                self.comic_data_items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
-                self.comic_data_items['comic_cover_urls'] = comic_cover_url
-                yield self.comic_data_items
+            self.comic_data_items['category'] = category
+            self.comic_data_items['comic_title'] = uuid_id
+            self.comic_data_items['comic_author'] = json.dumps(comic_author, ensure_ascii=False)
+
+            self.comic_data_items['comic_cover_urls'] = comic_cover_url
+            yield self.comic_data_items
         # 第二層 某本漫畫頁 獲取( 章節數ID(有幾話)
             comic_url = "https://18comic.org" + comic_link
             
             yield scrapy.Request(comic_url, callback = self.get_chapter_url, dont_filter=True, meta = self.comic_data_items)
+        next_page_url = response.xpath("(//a[@class='prevnext']/@href)[1]").extract()
+        print("下一頁網址：",next_page_url)
+        # yield scrapy.Request(next_page_url, callback = self.parse, dont_filter=True, meta = self.comic_data_items)
 
 
     def get_chapter_url(self, response):
         chapter_list = response.xpath("(//div[@class='col-lg-7']/div)[3]/div/ul/a/@href").extract()
-        
-        # 獲取章節網址、ＩＤ
-        # for i,j in enumerate(chapter_list):
-        #     print(i+1,j)
-
         meta = {'category':response.meta['category']}
-        for i in range(2):
-            if len(chapter_list) == 0 : 
-                comic_href = response.xpath("((//div[@class='col-lg-7']/div)[2]/a)[1]/@href").extract()
-                self.logging.error('檢查')
-                self.logging.error('==================')
-                self.logging.error(comic_href)
-                self.logging.error(comic_href.split('/'))
-                self.logging.error('==================')
-                meta['comic_id'] = comic_href.split('/')[2]
-                meta['comic_title'] = response.meta['comic_title']
-                chapter_url = "https://18comic.org" + comic_href
-                yield scrapy.Request(chapter_url, callback = self.get_content, dont_filter=True, meta = meta )
-                break
+        if len(chapter_list) == 0 : 
+            comic_href = response.xpath("((//div[@class='col-lg-7']/div)[2]/a)[1]/@href").extract()
+            meta['comic_id'] = comic_href[0].split('/')[2]
+            meta['comic_title'] = response.meta['comic_title']
+            chapter_url = "https://18comic.org" + comic_href
+            yield scrapy.Request(chapter_url, callback = self.get_content, dont_filter=True, meta = meta )
+        # 獲取章節網址、ＩＤ
+        else:
+            query_chapter = self.query_data('Content', response.meta['comic_title'])
+            if query_chapter:
+                del chapter_list[0:int(query_chapter)]
+                for chapter, chapter_path in enumerate(chapter_list):
+                    chapter_url =  "https://18comic.org" + chapter_path
+                    meta['comic_id'] = chapter_path.split('/')[2]
+                    meta['chapter_id'] = chapter + 1 + int(query_chapter)
+                    meta['comic_title'] = response.meta['comic_title']
+                    yield scrapy.Request(chapter_url, callback = self.get_content, dont_filter=True, meta = meta )
 
             else:
-                chapter_url =  "https://18comic.org" + chapter_list[i]
-                meta['comic_id'] = chapter_list[i].split('/')[2]
-                meta['chapter_id'] = i + 1
-                meta['comic_title'] = response.meta['comic_title']
-                yield scrapy.Request(chapter_url, callback = self.get_content, dont_filter=True, meta = meta )
-
+                for chapter, chapter_path in enumerate(chapter_list):
+                    chapter_url =  "https://18comic.org" + chapter_path
+                    meta['comic_id'] = chapter_path.split('/')[2]
+                    meta['chapter_id'] = chapter + 1
+                    meta['comic_title'] = response.meta['comic_title']
+                    yield scrapy.Request(chapter_url, callback = self.get_content, dont_filter=True, meta = meta )
 
     # 第三層 章節內頁 獲取(漫畫圖片)
     def get_content(self, response):

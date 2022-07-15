@@ -35,7 +35,6 @@ def query_data(item,args):
     except Exception as error:
         print(error)
 
-print(query_data('Content','158238cd075721499bf77009788a11c5'))
 
 # table
 # 漫畫資訊： uuid、name、author(非唯一）、publish_date、views
@@ -44,3 +43,34 @@ print(query_data('Content','158238cd075721499bf77009788a11c5'))
 # 漫畫圖片： uuid、chapter、photo_path(image base64)
 
 # p.s : photo_path，找Ｓ３的ＡＷＳ ＳＤＫ存入
+
+
+# "章節 1： https://18comic.org/photo/282293"
+# "章節 2： https://18comic.org/photo/315540"
+# "章節 3： https://18comic.org/photo/282303"
+# "章節 4： https://18comic.org/photo/282304"
+# "章節 5： https://18comic.org/photo/282305"
+# "章節 6： https://18comic.org/photo/282306"
+# "章節 7： https://18comic.org/photo/282307"
+# "章節 8： https://18comic.org/photo/283741"
+# "章節 9： https://18comic.org/photo/285858"
+
+
+chapter_list  = ["/photo/282293",
+            "/photo/315540",
+            "/photo/282303",
+            "/photo/282304",
+            "/photo/282305",
+            "/photo/282306",
+            "/photo/282307",
+            "/photo/283741",
+            "/photo/285858"]
+
+query_chapter = query_data('Content', '9f330a32d0b9039ee344531127bfed7c')
+if query_chapter:
+    del chapter_list[0:int(query_chapter)]
+    for i,j in enumerate(chapter_list):
+        print(f'章節 {i+1+int(query_chapter)}： https://18comic.org{j}')
+else:
+    for i,j in enumerate(chapter_list):
+        print(f'章節 {i+1}： https://18comic.org{j}')
