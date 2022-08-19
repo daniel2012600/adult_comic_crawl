@@ -200,6 +200,4 @@ cython_debug/
 
 /logs
 18comic.py
-proxy.json
 /images
-proxies_list.py
